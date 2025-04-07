@@ -133,7 +133,7 @@ class Trie:
 
 class Environment(gym.Env):
     def __init__(self, max_length=12):  # Maximum length can be adjusted.
-        commonsld_df = pd.read_csv('../clean_data/letters_training.csv')
+        commonsld_df = pd.read_csv('clean_data/popularsld.csv')
         real_sld_data = dict(zip(commonsld_df['sld'], commonsld_df['occurrence']))
 
         self.max_length = max_length
@@ -155,11 +155,19 @@ class Environment(gym.Env):
         self.state = [0] * self.max_length + [0]
         return self.state, {}
 
-    def reward_function(self, state=None, next_state=None):
+    def reward_function(self, state=None, next_state=None, episode=0):
         pointer = state[-1]
         sequence = state[:pointer]
         found, value, depth = self.trie.reward(sequence)
-        return np.power(0.8, self.max_length - pointer) * value
+        base_reward = value
+        length_factor = np.power(0.8, self.max_length - pointer)
+        diversity_bonus = len(set(sequence)) / (len(sequence) + 1)
+        
+        # Gradually increase the impact of the diversity bonus as training progresses.
+        curriculum_factor = min(1.0, episode / 5000)  # For example, fully apply after 5000 episodes.
+        shaped_reward = length_factor * (base_reward + 10 * curriculum_factor * diversity_bonus)
+        return shaped_reward
+
 
     def step(self, action):
         prev_state = self.state.copy()
@@ -442,13 +450,13 @@ class PPO:
 ###############################
 # Main Script: Training and Generating Names
 ###############################
-def load_corpus(csv_filename='../clean_data/popularsld.csv'):
+def load_corpus(csv_filename='clean_data/popularsld.csv'):
     df = pd.read_csv(csv_filename)
     return df['sld'].tolist()
 
 if __name__ == '__main__':
     NUM_EPISODES = 10000
-    env = Environment(max_length=15)  # Maximum length can be adjusted.
+    env = Environment(max_length=15)  
     ppo_agent = PPO(env, num_episodes=NUM_EPISODES)
     avg_backlog = ppo_agent.train()
 
@@ -478,7 +486,7 @@ if __name__ == '__main__':
     
     print("\nGenerated Names:")
     generated_names = []
-    csv_filename = "generated_names_10.csv"
+    csv_filename = "generated_names_1.csv"
     
     for i in range(100):
         beams = ppo_agent.beam_search_eval(
