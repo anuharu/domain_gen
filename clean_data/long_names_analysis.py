@@ -1,9 +1,10 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import wordninja
 
 df = pd.read_csv('commonsld.csv')
 
-long_names_df = df[df['sld'].str.len() > 9].copy()
+long_names_df = df[df['sld'].str.len() > 12].copy()
 
 # Function to analyze each sld string
 def analyze_sld(sld):
@@ -12,48 +13,26 @@ def analyze_sld(sld):
     consonant_count = len(sld) - vowel_count
     return vowel_count, consonant_count
 
-# Apply analysis on the long names
-long_names_df['length'] = long_names_df['sld'].apply(len)
-long_names_df['vowels'], long_names_df['consonants'] = zip(*long_names_df['sld'].apply(analyze_sld))
-long_names_df['vowel_percentage'] = (long_names_df['vowels'] / long_names_df['length'] * 100).round(2)
+def split_and_filter(sld):
+    words = wordninja.split(sld)
+    words = [w for w in words if len(w) >= 3]
+    return words
 
-# Graph 1: Bar chart for Occurrence of Long SLDs
-plt.figure(figsize=(8, 6))
-plt.bar(long_names_df['sld'], long_names_df['occurrence_count'])
-plt.xlabel('SLD')
-plt.ylabel('Occurrence')
-plt.title('Occurrences for SLDs Longer Than 9 Characters')
-plt.xticks(rotation=45)
-plt.tight_layout()
-plt.savefig("plot1.png")
-plt.show()
+long_names = long_names_df.copy()
+long_names['words'] = long_names['sld'].apply(split_and_filter)
+long_names['word_count'] = long_names['words'].apply(len)
+long_names['length'] = long_names['sld'].apply(len)
+long_names['vowels'], long_names['consonants'] = zip(*long_names['sld'].apply(analyze_sld))
+long_names['vowel_percentage'] = (long_names['vowels'] / long_names['length'] * 100).round(2)
 
-# Graph 2: Bar chart comparing Length, Vowels, and Consonants
-x = range(len(long_names_df))
-width = 0.25
+print("Long SLDs with word segmentation (only words >= 3 letters):")
+print(long_names[['sld', 'words', 'word_count']])
 
-plt.figure(figsize=(8, 6))
-plt.bar([p - width for p in x], long_names_df['length'], width, label='Length')
-plt.bar(x, long_names_df['vowels'], width, label='Vowels')
-plt.bar([p + width for p in x], long_names_df['consonants'], width, label='Consonants')
-plt.xlabel('SLD')
-plt.ylabel('Count')
-plt.title('Length, Vowels, and Consonants in SLDs')
-plt.xticks(x, long_names_df['sld'], rotation=45)
-plt.legend()
-plt.tight_layout()
+print("Analysis of SLDs with more than 9 characters:")
+print(long_names[['sld', 'length', 'vowels', 'consonants', 'vowel_percentage', 'occurrence_count']])
 
-plt.savefig("plot2.png")
-plt.show()
+long_names.to_csv('long_name_analysis.csv', index=False)
 
-# Graph 3: Bar chart for Vowel Percentage
-plt.figure(figsize=(8, 6))
-plt.bar(long_names_df['sld'], long_names_df['vowel_percentage'])
-plt.xlabel('SLD')
-plt.ylabel('Vowel Percentage (%)')
-plt.title('Vowel Percentage in SLDs Longer Than 9 Characters')
-plt.xticks(rotation=45)
-plt.tight_layout()
-
-plt.savefig("plo3.png")
+long_names['word_count'].hist(bins=20)
+plt.savefig('word_count_histogram.png')
 plt.show()
