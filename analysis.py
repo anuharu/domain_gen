@@ -5,9 +5,9 @@ from collections import Counter
 import matplotlib.pyplot as plt
 
 # List of CSV file names to combine
-csv_files = ["generated_names.csv"] + [f"generated_names_{i}.csv" for i in range(6, 10)]
+csv_files = ["generated_names.csv"] + [f"generated_names_{i}.csv" for i in range(1, 3)]
 
-csv_files = [f"generated_names_{i}.csv" for i in range(1, 6)]
+#csv_files = [f"generated_names_{i}.csv" for i in range(1, 6)]
 
 # Set to hold unique names and a counter for total names (including duplicates)
 unique_names = set()
@@ -89,6 +89,6 @@ for name in unique_names:
         full_domains.append(f"{name}.{tld}")
 
 # Write the full domain names to a text file
-with open("letter_domains.txt", "w", encoding="utf-8") as f:
+with open("domains.txt", "w", encoding="utf-8") as f:
     for domain in full_domains:
         f.write(domain + "\n")

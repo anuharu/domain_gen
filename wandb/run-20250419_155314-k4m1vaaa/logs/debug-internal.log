@@ -1,0 +1,16 @@
+{"time":"2025-04-19T15:53:14.818272024-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2025-04-19T15:53:14.818308853-05:00","level":"INFO","msg":"created symlink","path":"/home/una/domain_gen/wandb/run-20250419_155314-k4m1vaaa/logs/debug-core.log"}
+{"time":"2025-04-19T15:53:14.93822077-05:00","level":"INFO","msg":"created new stream","id":"k4m1vaaa"}
+{"time":"2025-04-19T15:53:14.938278338-05:00","level":"INFO","msg":"stream: started","id":"k4m1vaaa"}
+{"time":"2025-04-19T15:53:14.938335365-05:00","level":"INFO","msg":"sender: started","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T15:53:14.938378215-05:00","level":"INFO","msg":"handler: started","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T15:53:14.938327089-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T15:53:15.319141547-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-19T16:20:51.00483734-05:00","level":"INFO","msg":"stream: closing","id":"k4m1vaaa"}
+{"time":"2025-04-19T16:20:51.004908303-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-19T16:20:51.005905632-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-19T16:20:51.372472209-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-19T16:20:51.432140717-05:00","level":"INFO","msg":"handler: closed","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T16:20:51.432178398-05:00","level":"INFO","msg":"sender: closed","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T16:20:51.43216891-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"k4m1vaaa"}
+{"time":"2025-04-19T16:20:51.432318591-05:00","level":"INFO","msg":"stream: closed","id":"k4m1vaaa"}

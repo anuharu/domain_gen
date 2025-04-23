@@ -5,7 +5,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 
 # List of CSV file names to combine
-csv_files = ["generated_names.csv"] + [f"generated_names_{i}.csv" for i in range(1, 10)]
+csv_files = ["generated_names.csv"] + [f"generated_names_{i}.csv" for i in range(1, 3)]
 
 # Set to hold unique names and a counter for total names (including duplicates)
 unique_names = set()
@@ -21,7 +21,7 @@ for csv_file in csv_files:
             total_names += 1
             unique_names.add(name)
 
-popular_file = "../clean_data/popularsld.csv"
+popular_file = "/clean_data/popularsld.csv"
 popular_names = set()
 
 with open(popular_file, "r", newline="", encoding="utf-8") as pf:

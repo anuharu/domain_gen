@@ -14,6 +14,29 @@ import matplotlib.pyplot as plt
 import wandb
 import csv
 
+def readability_sld(sld: str) -> float:
+    """
+    A simple readability function for a second-level domain.
+    Starts from 100 and deducts penalties for deviation from an optimal length
+    and ideal vowel ratio.
+    
+    For example:
+      - Ideal length is taken here as ~8 characters.
+      - Ideal vowel ratio is ~0.4.
+    The score is clipped to 0-100.
+    """
+    s = sld.lower()
+    if len(s) == 0:
+        return 0
+    score = 100.0
+    # Length penalty: deduct 2 points for each character away from 8.
+    score -= 2 * abs(len(s) - 8)
+    # Vowel ratio penalty.
+    vowels = sum(ch in "aeiou" for ch in s)
+    ratio = vowels / len(s)
+    score -= 50 * abs(ratio - 0.4)
+    return max(0, min(100, score))
+
 ###############################
 # Markov Model (for entropy estimation)
 ###############################
@@ -60,7 +83,7 @@ TERMINATION_TOKEN_IDX = len(ALPHABET) - 1
 # NGramScorer: A Simple n-gram Markov Model for Name Scoring
 ###############################
 class NGramScorer:
-    def __init__(self, n=3):
+    def __init__(self, n=4):
         self.n = n
         self.ngram_counts = {}     # mapping: context tuple -> dict(next_token -> count)
         self.context_counts = {}   # mapping: context tuple -> total count
@@ -132,7 +155,7 @@ class Trie:
         return True, value, len(sequence)
 
 class Environment(gym.Env):
-    def __init__(self, max_length=12):  # Maximum length can be adjusted.
+    def __init__(self, max_length=13):  # Maximum length can be adjusted.
         commonsld_df = pd.read_csv('clean_data/popularsld.csv')
         real_sld_data = dict(zip(commonsld_df['sld'], commonsld_df['occurrence']))
 
@@ -166,8 +189,22 @@ class Environment(gym.Env):
         # Gradually increase the impact of the diversity bonus as training progresses.
         curriculum_factor = min(1.0, episode / 5000)  # For example, fully apply after 5000 episodes.
         shaped_reward = length_factor * (base_reward + 10 * curriculum_factor * diversity_bonus)
-        return shaped_reward
-
+        
+        name = ''.join([ALPHABET[token] for token in sequence if token != 0])
+        readability = readability_sld(name)
+        # Apply bonus/penalty based on readability thresholds.
+        if readability >= 80:
+            readability_bonus = 10  # Reward for high readability.
+        elif readability < 40:
+            readability_bonus = -10  # Penalty for low readability.
+        else:
+            readability_bonus = 0
+        
+        total_reward = shaped_reward + readability_bonus
+        
+        # Log the readability score to wandb.
+        wandb.log({"readability": readability})
+        return total_reward
 
     def step(self, action):
         prev_state = self.state.copy()
@@ -456,15 +493,15 @@ def load_corpus(csv_filename='clean_data/popularsld.csv'):
 
 if __name__ == '__main__':
     NUM_EPISODES = 10000
-    env = Environment(max_length=15)  
+    env = Environment(max_length=13)  
     ppo_agent = PPO(env, num_episodes=NUM_EPISODES)
     avg_backlog = ppo_agent.train()
 
     corpus = load_corpus()
-    ngram_scorer = NGramScorer(n=3)
+    ngram_scorer = NGramScorer(n=4)
     ngram_scorer.build_model(corpus)
 
-    test_env = Environment(max_length=15)
+    test_env = Environment(max_length=13)
     print("\nBeam Search Evaluations (with n-gram Markov scoring):")
     beams = ppo_agent.beam_search_eval(
         test_env,
@@ -486,9 +523,9 @@ if __name__ == '__main__':
     
     print("\nGenerated Names:")
     generated_names = []
-    csv_filename = "generated_names_1.csv"
+    csv_filename = "generated_names.csv"
     
-    for i in range(100):
+    for i in range(10000):
         beams = ppo_agent.beam_search_eval(
             test_env,
             beam_size=25,

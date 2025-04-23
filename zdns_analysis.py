@@ -7,7 +7,7 @@ resolved_count = 0
 total_count = 0
 resolved = []
 
-with open("letter_zdns_output.json", "r", encoding="utf-8") as f:
+with open("new_output.json", "r", encoding="utf-8") as f:
     for line in f:
         total_count += 1
         data = json.loads(line)

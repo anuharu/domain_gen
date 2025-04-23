@@ -1,0 +1,43 @@
+{
+  "os": "Linux-5.15.0-1069-oracle-x86_64-with-glibc2.35",
+  "python": "3.10.12",
+  "startedAt": "2025-04-15T04:54:45.179571Z",
+  "program": "/home/una/domain_gen/name_gen.py",
+  "codePath": "name_gen.py",
+  "git": {
+    "remote": "https://github.com/anuharu/domain_gen.git",
+    "commit": "795f27eb3bc1227cb9847865318875ac647ad818"
+  },
+  "email": "hchan46@wisc.edu",
+  "root": "/home/una/domain_gen",
+  "host": "node65",
+  "username": "una",
+  "executable": "/usr/bin/python3",
+  "codePathLocal": "name_gen.py",
+  "cpu_count": 32,
+  "cpu_count_logical": 64,
+  "gpu": "NVIDIA A30",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "1570820493312",
+      "used": "490324643840"
+    }
+  },
+  "memory": {
+    "total": "134592905216"
+  },
+  "cpu": {
+    "count": 32,
+    "countLogical": 64
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA A30",
+      "memoryTotal": "25769803776",
+      "cudaCores": 3584,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.4"
+}

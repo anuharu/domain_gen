@@ -1,0 +1,16 @@
+{"time":"2025-04-19T14:54:25.868511172-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2025-04-19T14:54:25.868543903-05:00","level":"INFO","msg":"created symlink","path":"/home/una/domain_gen/wandb/run-20250419_145425-xhenhr2d/logs/debug-core.log"}
+{"time":"2025-04-19T14:54:25.9870759-05:00","level":"INFO","msg":"created new stream","id":"xhenhr2d"}
+{"time":"2025-04-19T14:54:25.987116697-05:00","level":"INFO","msg":"stream: started","id":"xhenhr2d"}
+{"time":"2025-04-19T14:54:25.987171339-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T14:54:25.987230169-05:00","level":"INFO","msg":"sender: started","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T14:54:25.987266968-05:00","level":"INFO","msg":"handler: started","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T14:54:26.151943001-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-19T15:22:13.430099573-05:00","level":"INFO","msg":"stream: closing","id":"xhenhr2d"}
+{"time":"2025-04-19T15:22:13.430152322-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-19T15:22:13.431253396-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-19T15:22:13.787499033-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-19T15:22:13.847700211-05:00","level":"INFO","msg":"handler: closed","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T15:22:13.847744093-05:00","level":"INFO","msg":"sender: closed","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T15:22:13.847743973-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"xhenhr2d"}
+{"time":"2025-04-19T15:22:13.847884286-05:00","level":"INFO","msg":"stream: closed","id":"xhenhr2d"}

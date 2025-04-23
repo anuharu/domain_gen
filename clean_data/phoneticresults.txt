@@ -1,0 +1,14 @@
+                    word  phonotactic_probability  log_phonotactic_probability
+0                outlook             4.496354e-11                   -23.825169
+1                 tdnsv8             1.169765e-23                   -52.802655
+2                    com             2.670726e-05                   -10.530575
+3               spectrum             3.553510e-11                   -24.060500
+4              amazonaws             7.803209e-56                  -126.890230
+...                  ...                      ...                          ...
+999993           francoc             2.804213e-31                   -70.349015
+999994  grossdevelopment             1.129517e-74                  -170.269507
+999995       futuretrust             9.018215e-55                  -124.442934
+999996         v-network             3.230089e-34                   -77.115383
+999997            ageeva             5.072147e-46                  -104.295150
+
+[999998 rows x 3 columns]
