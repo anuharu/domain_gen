@@ -68,7 +68,8 @@ def entropy_rate(model, stats):
 ###############################
 # Global Alphabet and Tokens
 ###############################
-ALPHABET = ['#'] + list(string.ascii_lowercase) + list(string.digits) + ['_']
+#ALPHABET = ['#'] + list(string.ascii_lowercase) + list(string.digits) + ['_']
+ALPHABET = ['#'] + list(string.ascii_lowercase) + ['_']
 TERMINATION_TOKEN_IDX = len(ALPHABET) - 1
 
 ###############################
@@ -147,7 +148,7 @@ class Trie:
 
 class Environment(gym.Env):
     def __init__(self, max_length=13):
-        commonsld_df = pd.read_csv('clean_data/popularsld.csv')
+        commonsld_df = pd.read_csv('clean_data/letters_training.csv')
         real_sld_data = dict(zip(commonsld_df['sld'], commonsld_df['occurrence']))
 
         self.max_length = max_length
@@ -367,7 +368,8 @@ class PPO:
         return np.array(avg_backlog)
 
 
-def load_corpus(csv_filename='clean_data/popularsld.csv'):
+
+def load_corpus(csv_filename='clean_data/letters_training.csv'):
     df = pd.read_csv(csv_filename)
     return df['sld'].tolist()
 

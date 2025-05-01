@@ -1,0 +1,91 @@
+Traceback (most recent call last):
+  File "/home/una/domain_gen/name_gen.py", line 402, in <module>
+    avg_backlog = ppo_agent.train()
+  File "/home/una/domain_gen/name_gen.py", line 237, in train
+    next_obs, reward, terminations, truncations, infos = self.env.step(action.cpu().numpy())
+  File "/home/una/domain_gen/name_gen.py", line 127, in step
+    reward = self.reward_function(prev_state)
+  File "/home/una/domain_gen/name_gen.py", line 102, in reward_function
+    pronounceability = pronounceability_sld(name)
+  File "/home/una/domain_gen/name_gen.py", line 23, in pronounceability_sld
+    phoneme_seq = g2p(sld.lower())
+  File "/home/una/.local/lib/python3.10/site-packages/g2p_en/g2p.py", line 162, in __call__
+    tokens = pos_tag(words)  # tuples of (word, tag)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/__init__.py", line 168, in pos_tag
+    tagger = _get_tagger(lang)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/__init__.py", line 110, in _get_tagger
+    tagger = PerceptronTagger()
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/perceptron.py", line 183, in __init__
+    self.load_from_json(lang)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/perceptron.py", line 273, in load_from_json
+    loc = find(f"taggers/averaged_perceptron_tagger_{lang}/")
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/data.py", line 579, in find
+    raise LookupError(resource_not_found)
+LookupError:
+**********************************************************************
+  Resource [93maveraged_perceptron_tagger_eng[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('averaged_perceptron_tagger_eng')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtaggers/averaged_perceptron_tagger_eng/[0m
+
+  Searched in:
+    - '/home/una/nltk_data'
+    - '/usr/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/local/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/local/lib/nltk_data'
+**********************************************************************
+
+Traceback (most recent call last):
+  File "/home/una/domain_gen/name_gen.py", line 402, in <module>
+    avg_backlog = ppo_agent.train()
+  File "/home/una/domain_gen/name_gen.py", line 237, in train
+    next_obs, reward, terminations, truncations, infos = self.env.step(action.cpu().numpy())
+  File "/home/una/domain_gen/name_gen.py", line 127, in step
+    reward = self.reward_function(prev_state)
+  File "/home/una/domain_gen/name_gen.py", line 102, in reward_function
+    pronounceability = pronounceability_sld(name)
+  File "/home/una/domain_gen/name_gen.py", line 23, in pronounceability_sld
+    phoneme_seq = g2p(sld.lower())
+  File "/home/una/.local/lib/python3.10/site-packages/g2p_en/g2p.py", line 162, in __call__
+    tokens = pos_tag(words)  # tuples of (word, tag)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/__init__.py", line 168, in pos_tag
+    tagger = _get_tagger(lang)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/__init__.py", line 110, in _get_tagger
+    tagger = PerceptronTagger()
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/perceptron.py", line 183, in __init__
+    self.load_from_json(lang)
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/tag/perceptron.py", line 273, in load_from_json
+    loc = find(f"taggers/averaged_perceptron_tagger_{lang}/")
+  File "/home/una/.local/lib/python3.10/site-packages/nltk/data.py", line 579, in find
+    raise LookupError(resource_not_found)
+LookupError:
+**********************************************************************
+  Resource [93maveraged_perceptron_tagger_eng[0m not found.
+  Please use the NLTK Downloader to obtain the resource:
+
+  [31m>>> import nltk
+  >>> nltk.download('averaged_perceptron_tagger_eng')
+  [0m
+  For more information see: https://www.nltk.org/data.html
+
+  Attempted to load [93mtaggers/averaged_perceptron_tagger_eng/[0m
+
+  Searched in:
+    - '/home/una/nltk_data'
+    - '/usr/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/share/nltk_data'
+    - '/usr/local/share/nltk_data'
+    - '/usr/lib/nltk_data'
+    - '/usr/local/lib/nltk_data'
+**********************************************************************

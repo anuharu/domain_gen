@@ -1,0 +1,16 @@
+{"time":"2025-04-30T00:28:08.47519256-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2025-04-30T00:28:08.475226384-05:00","level":"INFO","msg":"created symlink","path":"/home/una/domain_gen/wandb/run-20250430_002808-rbko7tql/logs/debug-core.log"}
+{"time":"2025-04-30T00:28:08.593429176-05:00","level":"INFO","msg":"created new stream","id":"rbko7tql"}
+{"time":"2025-04-30T00:28:08.593478889-05:00","level":"INFO","msg":"stream: started","id":"rbko7tql"}
+{"time":"2025-04-30T00:28:08.593539342-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:08.593601408-05:00","level":"INFO","msg":"handler: started","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:08.593547718-05:00","level":"INFO","msg":"sender: started","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:08.852228085-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-30T00:28:09.078875042-05:00","level":"INFO","msg":"stream: closing","id":"rbko7tql"}
+{"time":"2025-04-30T00:28:09.078913985-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-30T00:28:09.081425882-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-30T00:28:09.600863539-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-30T00:28:09.713740801-05:00","level":"INFO","msg":"handler: closed","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:09.713782739-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:09.71381505-05:00","level":"INFO","msg":"sender: closed","stream_id":"rbko7tql"}
+{"time":"2025-04-30T00:28:09.713873159-05:00","level":"INFO","msg":"stream: closed","id":"rbko7tql"}

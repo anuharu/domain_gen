@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/una/domain_gen/name_gen.py", line 423, in <module>
+    avg_backlog = ppo_agent.train()
+  File "/home/una/domain_gen/name_gen.py", line 258, in train
+    next_obs, reward, terminations, truncations, infos = self.env.step(action.cpu().numpy())
+  File "/home/una/domain_gen/name_gen.py", line 148, in step
+    r=self.reward_function(prev)
+  File "/home/una/domain_gen/name_gen.py", line 134, in reward_function
+    pron=pronounceability_sld(name)
+  File "/home/una/domain_gen/name_gen.py", line 49, in pronounceability_sld
+    return score(0.0, min(100.0, 100 * ratio))
+TypeError: 'float' object is not callable
+Traceback (most recent call last):
+  File "/home/una/domain_gen/name_gen.py", line 423, in <module>
+    avg_backlog = ppo_agent.train()
+  File "/home/una/domain_gen/name_gen.py", line 258, in train
+    next_obs, reward, terminations, truncations, infos = self.env.step(action.cpu().numpy())
+  File "/home/una/domain_gen/name_gen.py", line 148, in step
+    r=self.reward_function(prev)
+  File "/home/una/domain_gen/name_gen.py", line 134, in reward_function
+    pron=pronounceability_sld(name)
+  File "/home/una/domain_gen/name_gen.py", line 49, in pronounceability_sld
+    return score(0.0, min(100.0, 100 * ratio))
+TypeError: 'float' object is not callable

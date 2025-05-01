@@ -1,1 +1,2 @@
 new_output.json filter=lfs diff=lfs merge=lfs -text
+data/read_domains.txt filter=lfs diff=lfs merge=lfs -text

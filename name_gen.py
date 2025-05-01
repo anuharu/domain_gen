@@ -1,8 +1,22 @@
-import re
-from collections import defaultdict, deque, Counter
-import math
-import pdb
 import string
+from collections import defaultdict
+from g2p_en import G2p
+import nltk
+# Download and prepare NLTK data for G2P POS tagging
+nltk.download('punkt', quiet=True)
+nltk.download('averaged_perceptron_tagger', quiet=True)
+import os, shutil
+from nltk.data import find
+# Ensure resource directory matches g2p_en expectation (suffix "_eng")
+try:
+    find('taggers/averaged_perceptron_tagger_eng')
+except LookupError:
+    src_dir = find('taggers/averaged_perceptron_tagger')
+    parent = os.path.dirname(src_dir)
+    eng_dir = os.path.join(parent, 'averaged_perceptron_tagger_eng')
+    if not os.path.exists(eng_dir):
+        shutil.copytree(src_dir, eng_dir)
+
 import gymnasium as gym
 import pandas as pd
 import numpy as np
@@ -14,214 +28,133 @@ import matplotlib.pyplot as plt
 import wandb
 import csv
 
-def readability_sld(sld: str) -> float:
+# Initialize G2P model
+g2p = G2p()
+
+def pronounceability_sld(sld: str) -> float:
     """
-    A simple readability function for a second-level domain.
-    Starts from 100 and deducts penalties for deviation from an optimal length
-    and ideal vowel ratio.
-    
-    For example:
-      - Ideal length is taken here as ~8 characters.
-      - Ideal vowel ratio is ~0.4.
-    The score is clipped to 0-100.
+    Score a second-level domain by how cleanly it maps to phonemes.
+    (# phonemes / # characters) * 100, clipped to [0, 100].
+    Falls back to vowel ratio if G2P fails.
     """
-    s = sld.lower()
-    if len(s) == 0:
-        return 0
-    score = 100.0
-    # Length penalty: deduct 2 points for each character away from 8.
-    score -= 2 * abs(len(s) - 8)
-    # Vowel ratio penalty.
-    vowels = sum(ch in "aeiou" for ch in s)
-    ratio = vowels / len(s)
-    score -= 50 * abs(ratio - 0.4)
-    return max(0, min(100, score))
+    # compute phoneme-based ratio, with fallback
+    if len(sld) == 0:
+        return 0.0
+    try:
+        phoneme_seq = g2p(sld.lower())
+        phonemes = [ph for ph in phoneme_seq if ph.strip()]
+        ratio = len(phonemes) / len(sld)
+    except Exception:
+        vowels = sum(ch in "aeiou" for ch in sld.lower())
+        ratio = vowels / len(sld)
+    score = 100 * ratio
+    # clip to [0, 100]
+    if score < 0:
+        score = 0.0
+    elif score > 100:
+        score = 100.0
+    return score
 
-###############################
-# Markov Model (for entropy estimation)
-###############################
-def tokenize(file_path, tokenizer):
-    with open(file_path, mode="r", encoding="utf-8") as file:
-        for line in file:
-            for token in tokenizer(line.lower().strip()):
-                yield token
 
-def chars(file_path):
-    return tokenize(file_path, lambda s: s + " ")
-
-def words(file_path):
-    return tokenize(file_path, lambda s: re.findall(r"[a-zA-Z']+", s))
-
-def markov_model(stream, model_order):
-    model, stats = defaultdict(Counter), Counter()
-    circular_buffer = deque(maxlen=model_order)
-    for token in stream:
-        prefix = tuple(circular_buffer)
-        circular_buffer.append(token)
-        if len(prefix) == model_order:
-            stats[prefix] += 1
-            model[prefix][token] += 1
-    return model, stats
-
-def entropy(stats, normalization_factor):
-    return -sum(proba / normalization_factor * math.log2(proba / normalization_factor)
-                for proba in stats.values())
-
-def entropy_rate(model, stats):
-    return sum(stats[prefix] * entropy(model[prefix], stats[prefix]) for prefix in stats) / sum(stats.values())
-
-###############################
-# Global Alphabet and Tokens
-###############################
-# Index 0: '#' is used as the start token.
-# The last token, '_' (at index len(ALPHABET)-1), will serve as the termination token.
-# Include numbers along with lowercase letters.
-ALPHABET = ['#'] + list(string.ascii_lowercase) + list(string.digits) + ['_']
+# Global alphabet and termination token
+ALPHABET = ['#'] + list(string.ascii_lowercase) + ['_']
 TERMINATION_TOKEN_IDX = len(ALPHABET) - 1
 
-###############################
-# NGramScorer: A Simple n-gram Markov Model for Name Scoring
-###############################
 class NGramScorer:
     def __init__(self, n=4):
         self.n = n
-        self.ngram_counts = {}     # mapping: context tuple -> dict(next_token -> count)
-        self.context_counts = {}   # mapping: context tuple -> total count
+        self.ngram_counts = {}
+        self.context_counts = {}
         self.vocab_size = len(ALPHABET)
-    
+
     def build_model(self, corpus):
         for sld in corpus:
-            sld_str = str(sld)
-            if sld_str.lower() == 'nan' or not sld_str:
-                continue
-            tokens = [ALPHABET.index(ch) for ch in sld_str if ch in ALPHABET]
-            padded = [0] * (self.n - 1) + tokens
-            for i in range(self.n - 1, len(padded)):
-                context = tuple(padded[i - self.n + 1 : i])
-                token = padded[i]
-                if context not in self.ngram_counts:
-                    self.ngram_counts[context] = {}
-                self.ngram_counts[context][token] = self.ngram_counts[context].get(token, 0) + 1
-                self.context_counts[context] = self.context_counts.get(context, 0) + 1
+            s = str(sld)
+            if not s or s.lower() == 'nan': continue
+            tokens = [ALPHABET.index(ch) for ch in s if ch in ALPHABET]
+            padded = [0] * (self.n-1) + tokens
+            for i in range(self.n-1, len(padded)):
+                ctx = tuple(padded[i-self.n+1:i])
+                tok = padded[i]
+                self.ngram_counts.setdefault(ctx, {})[tok] = \
+                    self.ngram_counts.get(ctx, {}).get(tok, 0) + 1
+                self.context_counts[ctx] = self.context_counts.get(ctx, 0) + 1
 
     def score(self, sequence):
-        padded = [0] * (self.n - 1) + sequence
-        log_prob = 0.0
-        for i in range(self.n - 1, len(padded)):
-            context = tuple(padded[i - self.n + 1 : i])
-            token = padded[i]
-            count = self.ngram_counts.get(context, {}).get(token, 0)
-            total = self.context_counts.get(context, 0)
-            prob = (count + 1) / (total + self.vocab_size)
-            log_prob += np.log(prob)
-        return log_prob
+        padded = [0] * (self.n-1) + sequence
+        lp = 0.0
+        for i in range(self.n-1, len(padded)):
+            ctx = tuple(padded[i-self.n+1:i])
+            tok = padded[i]
+            cnt = self.ngram_counts.get(ctx, {}).get(tok, 0)
+            total = self.context_counts.get(ctx, 0)
+            prob = (cnt+1)/(total+self.vocab_size)
+            lp += np.log(prob)
+        return lp
 
-###############################
-# Trie and Gym Environment for Name Generation
-###############################
 class TrieNode:
     def __init__(self):
         self.children = defaultdict(TrieNode)
         self.is_end_of_word = False
-        self.end_count = 0
         self.count = 0
 
 class Trie:
-    def __init__(self):
-        self.root = TrieNode()
-
-    def insert(self, word, count=1):
+    def __init__(self): self.root = TrieNode()
+    def insert(self, w, c=1):
         node = self.root
-        for char in word:
-            node = node.children[char]
-            node.count += 1
+        for ch in w:
+            node = node.children[ch]; node.count += c
         node.is_end_of_word = True
-        node.end_count += count
-
-    def reward(self, sequence):
-        node = self.root
-        value = 0
-        for depth, token in enumerate(sequence):
-            # Optionally skip the start token.
-            if depth == 0 and token == 0:
-                continue
-            c = ALPHABET[token]
-            if c not in node.children:
-                return False, 0, depth + 1
-            node = node.children[c]
-            value += np.power(0.5, len(sequence) - (depth + 1)) * node.count
-        if node.is_end_of_word:
-            value += 100
-        return True, value, len(sequence)
+    def reward(self, seq):
+        node = self.root; val = 0
+        for d,t in enumerate(seq):
+            if d==0 and t==0: continue
+            ch = ALPHABET[t]
+            if ch not in node.children: return False,0,d+1
+            node = node.children[ch]
+            val += (0.5**(len(seq)-(d+1))) * node.count
+        if node.is_end_of_word: val += 100
+        return True,val,len(seq)
 
 class Environment(gym.Env):
-    def __init__(self, max_length=13):  # Maximum length can be adjusted.
-        commonsld_df = pd.read_csv('clean_data/popularsld.csv')
-        real_sld_data = dict(zip(commonsld_df['sld'], commonsld_df['occurrence']))
-
+    def __init__(self, max_length=12):
+        df = pd.read_csv('clean_data/letters_training.csv')
+        real = dict(zip(df['sld'],df['occurrence']))
         self.max_length = max_length
-        # State: max_length token positions plus a pointer (last element).
         self.observation_space = gym.spaces.Box(
-            low=np.array([0] * (self.max_length + 1)),
-            high=np.array([27] * self.max_length + [self.max_length]),
-            shape=(self.max_length + 1,),
-            dtype=np.int32)
+            low=np.zeros(self.max_length+1,dtype=np.int32),
+            high=np.array([len(ALPHABET)]*self.max_length+[self.max_length],dtype=np.int32),
+            shape=(self.max_length+1,),dtype=np.int32)
         self.action_space = gym.spaces.Discrete(len(ALPHABET))
-
         self.trie = Trie()
-        for sld, count in real_sld_data.items():
-            sld = str(sld)
-            self.trie.insert(sld, count)
+        for w,c in real.items(): self.trie.insert(str(w),c)
 
-    def reset(self):
-        # Initialize state: all tokens set to 0 and pointer at 0.
-        self.state = [0] * self.max_length + [0]
-        return self.state, {}
+    def reset(self): self.state=[0]*self.max_length+[0]; return self.state,{}
 
     def reward_function(self, state=None, next_state=None, episode=0):
-        pointer = state[-1]
-        sequence = state[:pointer]
-        found, value, depth = self.trie.reward(sequence)
-        base_reward = value
-        length_factor = np.power(0.8, self.max_length - pointer)
-        diversity_bonus = len(set(sequence)) / (len(sequence) + 1)
-        
-        # Gradually increase the impact of the diversity bonus as training progresses.
-        curriculum_factor = min(1.0, episode / 5000)  # For example, fully apply after 5000 episodes.
-        shaped_reward = length_factor * (base_reward + 10 * curriculum_factor * diversity_bonus)
-        
-        name = ''.join([ALPHABET[token] for token in sequence if token != 0])
-        readability = readability_sld(name)
-        # Apply bonus/penalty based on readability thresholds.
-        if readability >= 80:
-            readability_bonus = 10  # Reward for high readability.
-        elif readability < 40:
-            readability_bonus = -10  # Penalty for low readability.
-        else:
-            readability_bonus = 0
-        
-        total_reward = shaped_reward + readability_bonus
-        
-        # Log the readability score to wandb.
-        wandb.log({"readability": readability})
-        return total_reward
+        ptr=state[-1]; seq=state[:ptr]
+        _,base,_ = self.trie.reward(seq)
+        lf=(0.8**(self.max_length-ptr))
+        db=len(set(seq))/(len(seq)+1)
+        cf=min(1.0,episode/5000)
+        shaped = lf*(base+10*cf*db)
+        name=''.join(ALPHABET[t] for t in seq if t)
+        pron=pronounceability_sld(name)
+        bonus=10 if pron>=80 else -10 if pron<40 else 0
+        wandb.log({'pronounceability':pron})
+        return shaped+bonus
 
     def step(self, action):
-        prev_state = self.state.copy()
-        pointer = self.state[-1]
-        if pointer < self.max_length:
-            self.state[pointer] = action.item() if hasattr(action, "item") else action
-        done = False
-        if pointer < self.max_length:
-            # If the termination token is produced, mark done (and do not increment pointer)
-            if self.state[pointer] == TERMINATION_TOKEN_IDX:
-                done = True
-            else:
-                self.state[-1] = pointer + 1
-        if self.state[-1] >= self.max_length:
-            done = True
-        reward = self.reward_function(prev_state)
-        return self.state, reward, done, False, {}
+        prev=self.state.copy(); ptr=prev[-1];
+        if ptr<self.max_length:
+            self.state[ptr]=action.item() if hasattr(action,'item') else action
+        done=False
+        if ptr<self.max_length:
+            if self.state[ptr]==TERMINATION_TOKEN_IDX: done=True
+            else: self.state[-1]=ptr+1
+        if self.state[-1]>=self.max_length: done=True
+        r=self.reward_function(prev)
+        return self.state,r,done,False,{}
 
 ###############################
 # Agent and PPO for Name Generation
@@ -487,13 +420,13 @@ class PPO:
 ###############################
 # Main Script: Training and Generating Names
 ###############################
-def load_corpus(csv_filename='clean_data/popularsld.csv'):
+def load_corpus(csv_filename='clean_data/letters_training.csv'):
     df = pd.read_csv(csv_filename)
     return df['sld'].tolist()
 
 if __name__ == '__main__':
     NUM_EPISODES = 10000
-    env = Environment(max_length=13)  
+    env = Environment(max_length=12)  
     ppo_agent = PPO(env, num_episodes=NUM_EPISODES)
     avg_backlog = ppo_agent.train()
 
@@ -501,7 +434,7 @@ if __name__ == '__main__':
     ngram_scorer = NGramScorer(n=4)
     ngram_scorer.build_model(corpus)
 
-    test_env = Environment(max_length=13)
+    test_env = Environment(max_length=12)
     print("\nBeam Search Evaluations (with n-gram Markov scoring):")
     beams = ppo_agent.beam_search_eval(
         test_env,
@@ -523,9 +456,9 @@ if __name__ == '__main__':
     
     print("\nGenerated Names:")
     generated_names = []
-    csv_filename = "generated_names.csv"
+    csv_filename = "generated_names_4.csv"
     
-    for i in range(10000):
+    for i in range(100000):
         beams = ppo_agent.beam_search_eval(
             test_env,
             beam_size=25,

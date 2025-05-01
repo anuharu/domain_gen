@@ -93,12 +93,12 @@ def process_csv(csv_file):
     except Exception as e:
         print(f"Error reading CSV file: {e}")
         return None
-    if 'sld' not in df.columns:
+    if 'SLD' not in df.columns:
         raise ValueError("CSV file must contain a column named 'sld'.")
-    df = df[df['sld'].str.len() < 14]
-    df = df[df['sld'].apply(lambda x: isinstance(x, str))]
+    df = df[df['SLD'].str.len() < 14]
+    df = df[df['SLD'].apply(lambda x: isinstance(x, str))]
     results = []
-    for word in df['sld']:
+    for word in df['SLD']:
         prob = phonotactic_probability(word)
         results.append({'word': word, 'phonotactic_probability': prob})
     result_df = pd.DataFrame(results)
@@ -108,7 +108,7 @@ def process_csv(csv_file):
 # Main Execution Block
 # -------------------------------
 if __name__ == "__main__":
-    csv_file = "popularsld.csv"
+    csv_file = "../generated_names.csv"
     result_df = process_csv(csv_file)
     if result_df is not None:
         # Compute log probabilities
@@ -127,4 +127,4 @@ if __name__ == "__main__":
         stats.to_csv('phonotactic_stats.csv')
         stats_log.to_csv('phonotactic_log_stats.csv')
         # Save detailed results
-        result_df.to_csv("phoneticresults.csv", index=False)
+        result_df.to_csv("1_phoneticresults.csv", index=False)

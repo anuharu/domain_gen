@@ -1,0 +1,16 @@
+{"time":"2025-04-26T22:16:27.510363772-05:00","level":"INFO","msg":"using version","core version":"0.18.7"}
+{"time":"2025-04-26T22:16:27.510383388-05:00","level":"INFO","msg":"created symlink","path":"/home/una/domain_gen/wandb/run-20250426_221627-ohfs5o9g/logs/debug-core.log"}
+{"time":"2025-04-26T22:16:27.623476651-05:00","level":"INFO","msg":"created new stream","id":"ohfs5o9g"}
+{"time":"2025-04-26T22:16:27.623508751-05:00","level":"INFO","msg":"stream: started","id":"ohfs5o9g"}
+{"time":"2025-04-26T22:16:27.623589883-05:00","level":"INFO","msg":"writer: Do: started","stream_id":"ohfs5o9g"}
+{"time":"2025-04-26T22:16:27.623616523-05:00","level":"INFO","msg":"handler: started","stream_id":"ohfs5o9g"}
+{"time":"2025-04-26T22:16:27.623666386-05:00","level":"INFO","msg":"sender: started","stream_id":"ohfs5o9g"}
+{"time":"2025-04-26T22:16:27.825329729-05:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-04-27T01:48:01.539823474-05:00","level":"INFO","msg":"stream: closing","id":"ohfs5o9g"}
+{"time":"2025-04-27T01:48:01.539895729-05:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-04-27T01:48:01.540971445-05:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-04-27T01:48:01.960343396-05:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-04-27T01:48:02.044520233-05:00","level":"INFO","msg":"handler: closed","stream_id":"ohfs5o9g"}
+{"time":"2025-04-27T01:48:02.044568774-05:00","level":"INFO","msg":"sender: closed","stream_id":"ohfs5o9g"}
+{"time":"2025-04-27T01:48:02.044545761-05:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ohfs5o9g"}
+{"time":"2025-04-27T01:48:02.04468404-05:00","level":"INFO","msg":"stream: closed","id":"ohfs5o9g"}
